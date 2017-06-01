@@ -1,0 +1,338 @@
+
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Look mum, no hands! Mind control in JavaScript</title>
+
+		<meta name="description" content="A talk on creating a framework for the Epoc brain sensor in JavaScript">
+		<meta name="author" content="Charlie Gerard">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400,300,200,500,600,700,900' rel='stylesheet' type='text/css'>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal campjs-talk">
+
+			<div class="slides">
+				<div class="twitter-handle">
+					<a href="http://twitter.com/charlie__gerard">@charlie__gerard</a>
+				</div>
+
+				<section class="intro">
+					<h1 class="small-title">Look mum, no hands!</h1>
+					<h3 class="big-subtitle">Mind control in JavaScript</h3>
+					<p>
+						<small>Created by <a href="http://github.com/charliegerard">Charlie Gerard</a> / <a href="http://twitter.com/charlie__gerard">@charlie__gerard</a></small>
+					</p>
+				</section>
+
+				<section class="about-me" id="fragments">
+					<img src="https://media.giphy.com/media/w3J7mstYCISqs/giphy.gif">
+					<div class="content">
+						<h3>About me</h3>
+						<p class="fragment">Currently: <em>Creative Developer @NYT</em></p>
+						<p class="fragment">Previously: <em>Software Developer @ThoughtWorks</em></p>
+						<p class="fragment">Mainly: <em>I like to make (useless) stuff</em></p>
+					</div>
+				</section>
+
+				<section class="topic">
+					<h3>What is this talk about?</h3>
+					<ul>
+						<li>How I got here.</li>
+						<li>Tools used.</li>
+						<li>Code samples.</li>
+						<li>Live demo</li>
+						<li>Resources.</li>
+					</ul>
+				</section>
+
+				<section id="tools">
+					<section>
+						<h3>How it all started...</h3>
+					</section>
+
+					<section>
+						<h2>Step 1</h2>
+						<img src="http://charliegerard.github.io/images/leap-sphero-video.gif" alt="" style="width: 700px">
+						<p>Leap Motion + Sphero with Node.js</p>
+					</section>
+
+					<section>
+						<h2>Step 2</h2>
+						<img src="http://charliegerard.github.io/images/myo-sphero3.png" alt="" style="width: 700px">
+						<p>Myo armband + Sphero with Node.js</p>
+					</section>
+
+					<section>
+						<h2>Step 3</h2>
+						<img src="https://cdn.shopify.com/s/files/1/0031/6882/t/12/assets/MindWave-headset.jpg?2137080139183096221" alt="" style="width: 300px">
+						<p>Neurosky + Sphero with Node.js</p>
+					</section>
+
+					<section>
+						<!-- <h3>Emotiv EPOC headset / C++ SDK</h3> -->
+						<h2>Step 4</h2>
+						<!-- <a href="http://emotiv.com" target="_blank"><img src="images/EPOC_Emotiv.png" alt="" /></a> -->
+						<a href="http://emotiv.com" target="_blank"><img src="images/me-emotiv.png" alt="" style="width: 700px"/></a>
+						<p>Emotiv EPOC</p>
+					</section>
+
+					<section class="fragments2">
+						<!-- <h3>Emotiv EPOC headset / C++ SDK</h3> -->
+						<h2>But...</h2>
+						<a href="http://emotiv.com" target="_blank"><img src="images/EPOC_Emotiv.png" alt="" /></a>
+						<ul>
+							<li class="fragment">Not many resources available. <i class="em em-disappointed"></i></li>
+							<li class="fragment">SDK only available in C++, C#, Java, Python, Obj-C. <i class="em em-fearful"></i></li>
+							<li class="fragment">Knowledge of C++: barely any... <i class="em em-poop"></i></li>
+						</ul>
+					</section>
+
+					<section class="fragments">
+						<h2>Solution</h2>
+						<div class="fragment">
+							<p>Create a JavaScript framework.</p>
+							<img src="https://railsgirlssummerofcode.org/img/blog/2016/l1ghtsab3r-partyparrot.gif" style="width: 400px" alt="">
+						</div>
+					</section>
+				</section>
+
+				<section id="frameworks">
+					<section>
+						<h3>Tech stack</h3>
+						<ul>
+							<li>Emotiv EPOC <strong>C++ SDK</strong>.</li>
+							<li><strong>Node-gyp</strong>: A CLI tool for compiling native addons for Node.js.</li>
+							<li><strong>Node-bindings</strong>: Helper module for loading native module's .node file.</li>
+							<li><strong>Nan</strong>: Native Abstractions in Node.js.</li>
+						</ul>
+					</section>
+
+					<section>
+						<h3>Hello World example</h3>
+						<pre><code data-trim data-noescape>
+# hello.cc file
+# ----------------
+void Method(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  std::cout << "hello world" << std::endl;
+}
+
+void Init(v8::Local<v8::Object> exports) {
+  NODE_SET_METHOD(exports, "hello", Method);
+}
+
+NODE_MODULE(module, Init);
+						</code></pre>
+					</section>
+					<section>
+						<h3>Hello World example</h3>
+
+						<pre><code data-trim data-noescape>
+# binding.gyp file.
+# ----------------
+{
+  "targets": [
+    {
+      "target_name": "module",
+      "sources": [ "hello.cc" ]
+    }
+  ]
+}
+						</code></pre>
+						<pre><code>node-gyp rebuild</code></pre>
+					</section>
+					<section>
+						<h3>Hello World example</h3>
+
+						<pre><code data-trim data-noescape>
+# test.js file.
+# ----------------
+var addon = require('bindings')('module');
+console.log(addon.hello());
+						</code></pre>
+
+						<pre><code>node test.js // 'hello world'</code></pre>
+					</section>
+				</section>
+
+				<section class="demos">
+					<section>
+						<h3>Code samples</h3>
+						<pre><code data-trim data-noescape>
+# functions.cc
+# ------------
+NAN_METHOD(Connect) {
+ EmoStateHandle eState = EE_EmoStateCreate();
+
+ v8::Local<v8::Object> event = Nan::New<v8::Object>();
+
+ user.isBlinking = ES_ExpressivIsBlink(eState);
+ Nan::Set(event, Nan::New("blink").ToLocalChecked(), Nan::New(user.isBlinking));
+}
+						</code></pre>
+					</section>
+<!--
+					<section>
+						<pre><code data-trim data-noescape>
+# epoc.cc
+# I don't think I need this file...
+# ------------
+using v8::FunctionTemplate;
+
+NAN_MODULE_INIT(InitAll) {
+  Nan::Set(target, Nan::New("connect").ToLocalChecked(),
+    Nan::GetFunction(Nan::New<FunctionTemplate>(Connect)).ToLocalChecked());
+}
+
+NODE_MODULE(NativeExtension, InitAll)
+						</code></pre>
+					</section> -->
+
+					<section>
+						<pre><code data-trim data-noescape>
+# binding.gyp
+# ------------
+{
+ "targets": [
+  {
+   "target_name": "index",
+   "sources": [ "epoc.cc", "functions.cc"]
+  }
+ ]
+}
+						</code></pre>
+					</section>
+
+					<section>
+						<pre><code data-trim data-noescape>
+# main.js
+# ------------
+var Epoc = require('bindings')('index');
+Epoc.connect(function(event){
+ console.log(event);
+})
+					</code></pre>
+				</section>
+			</section>
+		</section>
+
+				<section class="demos">
+					<section>
+						<h3>Demos</h3>
+						<img src="images/demos.gif" style="width: 700px">
+					</section>
+
+					<section>
+						<h3>Emulation with EmoComposer</h3>
+						<video src="images/emocomposer.mov" controls style="width: 700px">
+						</video>
+					</section>
+
+					<section>
+						<h3>Mental commands</h3>
+						<a href="https://github.com/charliegerard/Epoc.js" target="_blank"><video controls loop src="images/emotiv-interface.mov"></video></a>
+					</section>
+
+					<section>
+						<h3>Facial expressions</h3>
+						<a href="https://github.com/charliegerard/Epoc.js" target="_blank"><video controls src="images/emotiv-demo.mov"></video></a>
+					</section>
+
+					<section>
+						<h3>Epoc & Drone</h3>
+						<!-- <img src="images/demos.gif" style="width: 700px"> -->
+						<iframe src="https://giphy.com/embed/l46Cbqvg6gxGvh2PS" width="480" height="330" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+					</section>
+				</section>
+
+
+				<section class="demos">
+					<!-- <h3>Learnings</h3>
+					<ul>
+						<li>I need to learn C++.</li>
+						<li>Hardware is (still) hard.</li>
+					</ul>
+				</section> -->
+
+				<section class="resources">
+					<h3>Resources</h3>
+					<ul>
+						<li><a href="https://github.com/charliegerard/Epoc.js" target="_blank"><p>Epoc.js</p></a></li>
+						<li><a href="https://github.com/nodejs/node-gyp" target="_blank"><p>Node-gyp</p></a></li>
+						<li><a href="https://github.com/nodejs/nan" target="_blank"><p>Nan</p></a></li>
+						<li><a href="https://github.com/TooTallNate/node-bindings" target="_blank"><p>Node-bindings</p></a></li>
+						<li><a href="https://github.com/Emotiv/community-sdk" target="_blank"><p>Emotiv Community SDK</p></a></li>
+						<li><a href="https://github.com/nodejs/node-addon-examples" target="_blank"><p>Node addon examples</p></a></li>
+					</ul>
+				</section>
+
+				<section class="thanks">
+					<iframe src="https://giphy.com/embed/3oEjHWXddcCOGZNmFO" width="480" height="386" style="display:block; margin: 0 auto;" frameBorder="0" class="giphy-embed" allowFullScreen></iframe>
+					<a href="http://twitter.com/charlie__gerard" target="_blank"><img src="images/Twitter_logo_blue.png" style="width: 50px" alt="Twitter"></a>
+					<a href="http://github.com/charliegerard" target="_blank"><img src="images/github.svg" style="width: 47px" alt="github"></a>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				showNotes: false,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
