@@ -1,5 +1,5 @@
-# Talk for the Sydney Interactive Arts meetups - July 2016
+# Slides for my talk at Web Rebels - June 2017
 
-[Link to presentation](http://charliegerard.github.io/talks/interactive-arts-meetup/#/)
+[Link to presentation](http://charliegerard.github.io/webrebels2017/#/)
 
 Created with [Reveal.js](http://lab.hakim.se/reveal-js).
